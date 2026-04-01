@@ -1,11 +1,18 @@
 <!DOCTYPE html>
-<html lang="vi">
+<html lang="vi" data-theme="dark">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>{% block title %}ParkEV System{% endblock %}</title>
   <meta name="description" content="He thong quan ly bai do xe va sac xe dien thong minh">
   <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  {# Áp dụng theme đã lưu TRƯỚC khi render để tránh flash #}
+  <script>
+    (function(){
+      var t = localStorage.getItem('parkev-theme') || 'dark';
+      document.documentElement.setAttribute('data-theme', t);
+    })();
+  </script>
   {% block head %}{% endblock %}
 </head>
 <body>
@@ -90,6 +97,11 @@
     </nav>
 
     <div class="sidebar-footer">
+      {# ── Theme toggle ── #}
+      <button class="theme-toggle-btn" id="themeToggleBtn" title="Chuyển giao diện">
+        <span class="theme-icon" id="themeIcon">🌙</span>
+        <span id="themeLabel">Chế độ tối</span>
+      </button>
       <div class="user-badge">
         <div class="avatar">{{ session.get('full_name','U')[0] }}</div>
         <div class="user-info">
@@ -100,7 +112,8 @@
             {% else %}Khach hang{% endif %}
           </div>
         </div>
-        <a href="{{ url_for('logout') }}" class="logout-btn" title="Dang xuat">⏏</a>
+        {# Nút đăng xuất → mở modal xác nhận #}
+        <button class="logout-btn" id="logoutTriggerBtn" title="Dang xuat">⏏</button>
       </div>
     </div>
   </aside>
@@ -150,5 +163,21 @@
 
 <script src="{{ url_for('static', filename='js/main.js') }}"></script>
 {% block scripts %}{% endblock %}
+
+{# ── Modal xác nhận đăng xuất ── #}
+{% if use_layout %}
+<div class="logout-modal-overlay" id="logoutModal">
+  <div class="logout-modal">
+    <span class="modal-icon">👋</span>
+    <h3>Đăng xuất?</h3>
+    <p>Bạn có chắc muốn thoát khỏi hệ thống<br>ParkEV không?</p>
+    <div class="logout-modal-actions">
+      <button class="btn btn-outline" id="logoutCancelBtn">Ở lại</button>
+      <a href="{{ url_for('logout') }}" class="btn btn-danger" id="logoutConfirmBtn">Đăng xuất</a>
+    </div>
+  </div>
+</div>
+{% endif %}
+
 </body>
 </html>

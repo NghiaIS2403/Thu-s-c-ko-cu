@@ -1,5 +1,56 @@
 // main.js — UI interactivity
 
+// ── Dark / Light Mode Toggle ──────────────────────────────────────
+const THEME_KEY = 'parkev-theme';
+const themeBtn  = document.getElementById('themeToggleBtn');
+const themeIcon = document.getElementById('themeIcon');
+const themeLabel = document.getElementById('themeLabel');
+
+function applyTheme(theme) {
+  document.documentElement.setAttribute('data-theme', theme);
+  localStorage.setItem(THEME_KEY, theme);
+  if (themeIcon)  themeIcon.textContent  = theme === 'light' ? '☀️' : '🌙';
+  if (themeLabel) themeLabel.textContent = theme === 'light' ? 'Chế độ sáng' : 'Chế độ tối';
+}
+
+// Khởi tạo label đúng với theme đang dùng
+applyTheme(localStorage.getItem(THEME_KEY) || 'dark');
+
+if (themeBtn) {
+  themeBtn.addEventListener('click', () => {
+    const current = document.documentElement.getAttribute('data-theme') || 'dark';
+    applyTheme(current === 'dark' ? 'light' : 'dark');
+  });
+}
+
+// ── Logout Confirm Modal ──────────────────────────────────────
+const logoutTrigger = document.getElementById('logoutTriggerBtn');
+const logoutCancel  = document.getElementById('logoutCancelBtn');
+
+// Query lazily — modal HTML nằm sau thẻ <script>, nên phải tìm lúc gọi
+function openLogoutModal() {
+  const m = document.getElementById('logoutModal');
+  if (m) m.classList.add('open');
+}
+function closeLogoutModal() {
+  const m = document.getElementById('logoutModal');
+  if (m) m.classList.remove('open');
+}
+
+if (logoutTrigger) logoutTrigger.addEventListener('click', openLogoutModal);
+if (logoutCancel)  logoutCancel.addEventListener('click', closeLogoutModal);
+
+// Đóng khi click ra ngoài modal
+document.addEventListener('click', (e) => {
+  const m = document.getElementById('logoutModal');
+  if (m && m.classList.contains('open') && e.target === m) closeLogoutModal();
+});
+
+// Đóng khi nhấn Escape
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') closeLogoutModal();
+});
+
 // ── Flash messages auto-dismiss ──────────────────────────────────
 document.querySelectorAll('.alert').forEach(el => {
   setTimeout(() => {
